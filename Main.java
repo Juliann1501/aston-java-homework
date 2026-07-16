@@ -1,96 +1,98 @@
+import java.util.Arrays;
+
 public class Main {
-
     public static void main(String[] args) {
-        // Создаем правильную коробку 4х4, где лежат только цифры
-        String[][] goodBox = {
-                {"1", "2", "3", "4"},
-                {"5", "6", "7", "8"},
-                {"9", "1", "2", "3"},
-                {"4", "5", "6", "7"}
-        };
-
-        // Создаем сломанную коробку (тут на одном этаже 5 комнат вместо 4)
-        String[][] badSizeBox = {
-                {"1", "2", "3", "4"},
-                {"5", "6", "7", "8", "9"},
-                {"9", "1", "2", "3"},
-                {"4", "5", "6", "7"}
-        };
-
-        // Создаем коробку с буквой-вредителем "Х" вместо цифры
-        String[][] badDataBox = {
-                {"1", "2", "3", "4"},
-                {"5", "6", "Х", "8"},
-                {"9", "1", "2", "3"},
-                {"4", "5", "6", "7"}
-        };
-
-        System.out.println("--- ТЕСТ 1: Проверяем правильный массив ---");
-        try {
-            int result = checkAndSum(goodBox);
-            System.out.println("Сумма всех чисел в массиве: " + result);
-        } catch (MyArraySizeException | MyArrayDataException e) {
-            System.out.println("Найдена ошибка: " + e.getMessage());
-        }
-
-        System.out.println("\n--- ТЕСТ 2: Подставляем массив неправильного размера ---");
-        try {
-            checkAndSum(badSizeBox);
-        } catch (MyArraySizeException | MyArrayDataException e) {
-            System.out.println("Найдена ошибка размера: " + e.getMessage());
-        }
-
-        System.out.println("\n--- ТЕСТ 3: Подставляем массив с буквой внутри ---");
-        try {
-            checkAndSum(badDataBox);
-        } catch (MyArraySizeException | MyArrayDataException e) {
-            System.out.println("Найдена ошибка данных: " + e.getMessage());
-        }
-
-        System.out.println("\n--- ТЕСТ 4: Специально ломаем массив (Пункт 4) ---");
-        try {
-            makeMistake();
-        } catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println("Найдена классическая ошибка: Выход за границы массива!");
-        }
+        printThreeWords();
+        checkSumSign();
+        printColor();
+        compareNumbers();
+        System.out.println("Задача 5: " + isSumInInterval(10, 5));
+        isPositiveOrNegative(-7);
+        System.out.println("Задача 7: " + isNegative(5));
+        printStringMultipleTimes("Привет!", 3);
+        System.out.println("2026 високосный? " + isLeapYear(2026));
+        invertArray();
+        fillArray();
+        multiplyLessThanSix();
+        fillDiagonal();
+        System.out.println("Задача 14: " + Arrays.toString(createArray(6, 8)));
     }
 
-    // Наш главный робот-конвейер
-    public static int checkAndSum(String[][] box) throws MyArraySizeException, MyArrayDataException {
-        if (box.length != 4) {
-            throw new MyArraySizeException("В массиве  должно быть ровно 4 строки!");
-        }
-        for (int i = 0; i < box.length; i++) {
-            if (box[i].length != 4) {
-                throw new MyArraySizeException("На строке " + i + " должно быть ровно 4 ячейки!");
+    public static void printThreeWords() {
+        System.out.println("Orange\nBanana\nApple");
+    }
+
+    public static void checkSumSign() {
+        int a = 15, b = -5;
+        System.out.println((a + b >= 0) ? "Сумма положительная" : "Сумма отрицательная");
+    }
+
+    public static void printColor() {
+        int value = 45;
+        if (value <= 0) System.out.println("Красный");
+        else if (value <= 100) System.out.println("Желтый");
+        else System.out.println("Зеленый");
+    }
+
+    public static void compareNumbers() {
+        int a = 8, b = 12;
+        System.out.println((a >= b) ? "a >= b" : "a < b");
+    }
+
+    public static boolean isSumInInterval(int x, int y) {
+        int sum = x + y;
+        return sum >= 10 && sum <= 20;
+    }
+
+    public static void isPositiveOrNegative(int x) {
+        System.out.println((x >= 0) ? "Число положительное" : "Число отрицательное");
+    }
+
+    public static boolean isNegative(int x) {
+        return x < 0;
+    }
+
+    public static void printStringMultipleTimes(String str, int times) {
+        for (int i = 0; i < times; i++) System.out.println(str);
+    }
+
+    public static boolean isLeapYear(int year) {
+        return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+    }
+
+    public static void invertArray() {
+        int[] arr = {1, 1, 0, 0, 1, 0, 1, 1, 0, 0};
+        for (int i = 0; i < arr.length; i++) arr[i] = 1 - arr[i];
+        System.out.println("Задача 10: " + Arrays.toString(arr));
+    }
+
+    public static void fillArray() {
+        int[] arr = new int[100];
+        for (int i = 0; i < arr.length; i++) arr[i] = i + 1;
+        System.out.println("Задача 11: " + Arrays.toString(arr));
+    }
+
+    public static void multiplyLessThanSix() {
+        int[] arr = {1, 5, 3, 2, 11, 4, 5, 2, 4, 8, 9, 1};
+        for (int i = 0; i < arr.length; i++) if (arr[i] < 6) arr[i] *= 2;
+        System.out.println("Задача 12: " + Arrays.toString(arr));
+    }
+
+    public static void fillDiagonal() {
+        int size = 5;
+        int[][] matrix = new int[size][size];
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (i == j || i + j == size - 1) matrix[i][j] = 1;
             }
         }
-
-        int totalSum = 0;
-        for (int i = 0; i < box.length; i++) {
-            for (int j = 0; j < box[i].length; j++) {
-                try {
-                    totalSum += Integer.parseInt(box[i][j]);
-                } catch (NumberFormatException e) {
-                    throw new MyArrayDataException("Внимание! На строке " + i + ", в ячейке " + j + " лежит что-то иное вместо числа!");}
-            }
-        }
-        return totalSum;
+        System.out.println("Задача 13:");
+        for (int i = 0; i < size; i++) System.out.println(Arrays.toString(matrix[i]));
     }
 
-    // Вредный робот для пункта 4
-    public static void makeMistake() {
-        String[] smallArray = {"Яблоко", "Банан"};
-        // Специально просим выдать 5-й элемент (которого нет), чтобы программа закричала
-        System.out.println(smallArray[5]);
+    public static int[] createArray(int len, int initialValue) {
+        int[] arr = new int[len];
+        Arrays.fill(arr, initialValue);
+        return arr;
     }
-}
-
-// Наши кастомные кричалки-ошибки
-class MyArraySizeException extends Exception {
-    public MyArraySizeException(String message) { super(message); }
-}
-
-class MyArrayDataException extends Exception {
-    public MyArrayDataException(String message) { super(message); }
 }
