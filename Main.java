@@ -1,96 +1,123 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+
 public class Main {
 
     public static void main(String[] args) {
-        // Создаем правильную коробку 4х4, где лежат только цифры
-        String[][] goodBox = {
-                {"1", "2", "3", "4"},
-                {"5", "6", "7", "8"},
-                {"9", "1", "2", "3"},
-                {"4", "5", "6", "7"}
-        };
+        System.out.println("=== ТЕСТ ЗАДАНИЯ 1: Студенты ===");
 
-        // Создаем сломанную коробку (тут на одном этаже 5 комнат вместо 4)
-        String[][] badSizeBox = {
-                {"1", "2", "3", "4"},
-                {"5", "6", "7", "8", "9"},
-                {"9", "1", "2", "3"},
-                {"4", "5", "6", "7"}
-        };
+        // Создаем список студентов (картотеку)
+        List<Student> students = new ArrayList<>();
 
-        // Создаем коробку с буквой-вредителем "Х" вместо цифры
-        String[][] badDataBox = {
-                {"1", "2", "3", "4"},
-                {"5", "6", "Х", "8"},
-                {"9", "1", "2", "3"},
-                {"4", "5", "6", "7"}
-        };
+        // Добавляем примеры оценок (математика, физика, ИТ)
+        List<Integer> grades1 = List.of(4, 5, 4); // Средний балл 4.3 (отличник)
+        List<Integer> grades2 = List.of(2, 3, 2); // Средний балл 2.3 (двоечник)
+        List<Integer> grades3 = List.of(3, 3, 4); // Средний балл 3.3 (хорошист)
 
-        System.out.println("--- ТЕСТ 1: Проверяем правильный массив ---");
-        try {
-            int result = checkAndSum(goodBox);
-            System.out.println("Сумма всех чисел в массиве: " + result);
-        } catch (MyArraySizeException | MyArrayDataException e) {
-            System.out.println("Найдена ошибка: " + e.getMessage());
+        students.add(new Student("Соня", "QA-01", 1, grades1));
+        students.add(new Student("Петя", "QA-01", 1, grades2));
+        students.add(new Student("Юля", "QA-02", 2, grades3));
+
+        System.out.println("Студенты до проверки деканатом:");
+        for (Student s : students) {
+            System.out.println(s.name + ", Курс: " + s.course + ", Оценки: " + s.grades);
         }
 
-        System.out.println("\n--- ТЕСТ 2: Подставляем массив неправильного размера ---");
-        try {
-            checkAndSum(badSizeBox);
-        } catch (MyArraySizeException | MyArrayDataException e) {
-            System.out.println("Найдена ошибка размера: " + e.getMessage());
+        // Запускаем робота-чистильщика и переводчика
+        processStudents(students);
+
+        System.out.println("\nСтуденты после работы деканата (двоечников отчислили, остальных перевели):");
+        for (Student s : students) {
+            System.out.println(s.name + ", Курс: " + s.course);
         }
 
-        System.out.println("\n--- ТЕСТ 3: Подставляем массив с буквой внутри ---");
-        try {
-            checkAndSum(badDataBox);
-        } catch (MyArraySizeException | MyArrayDataException e) {
-            System.out.println("Найдена ошибка данных: " + e.getMessage());
-        }
+        System.out.println("\nИщем, кто учится на 2 курсе:");
+        printStudents(students, 2);
 
-        System.out.println("\n--- ТЕСТ 4: Специально ломаем массив (Пункт 4) ---");
-        try {
-            makeMistake();
-        } catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println("Найдена классическая ошибка: Выход за границы массива!");
+
+        System.out.println("\n=== ТЕСТ ЗАДАНИЯ 2: Телефонный Справочник ===");
+        Phonebook phonebook = new Phonebook();
+
+        // Добавляем телефоны (у Ивановых будет два номера!)
+        phonebook.add("Иванов", "+7-999-111-22-33");
+        phonebook.add("Иванов", "+7-999-555-66-77");
+        phonebook.add("Петров", "+7-999-333-44-55");
+
+        // Проверяем поиск
+        System.out.println("Номера Ивановых: " + phonebook.get("Иванов"));
+        System.out.println("Номера Петровых: " + phonebook.get("Петров"));
+        System.out.println("Номера Сидоровых (кого нет): " + phonebook.get("Сидоров"));
+    }
+
+    // Робот-чистильщик и переводчик для Задания 1
+    public static void processStudents(List<Student> students) {
+        // Используем специальный инструмент Iterator, чтобы безопасно удалять элементы на бегу
+        Iterator<Student> iterator = students.iterator();
+        while (iterator.hasNext()) {
+            Student student = iterator.next();
+
+            // Считаем сумму оценок
+            double sum = 0;
+            for (int grade : student.grades) {
+                sum += grade;
+            }
+            double average = sum / student.grades.size(); // Находим средний балл
+
+            // Если балл меньше 3 — отчисляем (удаляем из списка)
+            if (average < 3) {
+                iterator.remove();
+            } else {
+                // Иначе — переводим на следующий курс
+                student.course++;
+            }
         }
     }
 
-    // Наш главный робот-конвейер
-    public static int checkAndSum(String[][] box) throws MyArraySizeException, MyArrayDataException {
-        if (box.length != 4) {
-            throw new MyArraySizeException("В массиве  должно быть ровно 4 строки!");
-        }
-        for (int i = 0; i < box.length; i++) {
-            if (box[i].length != 4) {
-                throw new MyArraySizeException("На строке " + i + " должно быть ровно 4 ячейки!");
+    // Робот-глашатай для Задания 1
+    public static void printStudents(List<Student> students, int course) {
+        for (Student student : students) {
+            if (student.course == course) {
+                System.out.println("Студент: " + student.name + " обучается на курсе " + course);
             }
         }
-
-        int totalSum = 0;
-        for (int i = 0; i < box.length; i++) {
-            for (int j = 0; j < box[i].length; j++) {
-                try {
-                    totalSum += Integer.parseInt(box[i][j]);
-                } catch (NumberFormatException e) {
-                    throw new MyArrayDataException("Внимание! На строке " + i + ", в ячейке " + j + " лежит что-то иное вместо числа!");}
-            }
-        }
-        return totalSum;
-    }
-
-    // Вредный робот для пункта 4
-    public static void makeMistake() {
-        String[] smallArray = {"Яблоко", "Банан"};
-        // Специально просим выдать 5-й элемент (которого нет), чтобы программа закричала
-        System.out.println(smallArray[5]);
     }
 }
 
-// Наши кастомные кричалки-ошибки
-class MyArraySizeException extends Exception {
-    public MyArraySizeException(String message) { super(message); }
+// Класс Студент (карточка)
+class Student {
+    String name;
+    String group;
+    int course;
+    List<Integer> grades;
+
+    public Student(String name, String group, int course, List<Integer> grades) {
+        this.name = name;
+        this.group = group;
+        this.course = course;
+        this.grades = grades;
+    }
 }
 
-class MyArrayDataException extends Exception {
-    public MyArrayDataException(String message) { super(message); }
+// Класс Телефонный Справочник для Задания 2
+class Phonebook {
+    // Создаем карту: Фамилия (String) -> Список номеров (List<String>)
+    private HashMap<String, List<String>> book = new HashMap<>();
+
+    // Метод добавления номера
+    public void add(String surname, String phoneNumber) {
+        // Если такой фамилии еще нет в справочнике — создаем для нее пустой список номеров
+        if (!book.containsKey(surname)) {
+            book.put(surname, new ArrayList<>());
+        }
+        // Добавляем номер телефона в список этой фамилии
+        book.get(surname).add(phoneNumber);
+    }
+
+    // Метод поиска номеров
+    public List<String> get(String surname) {
+        // Если фамилия есть — отдаем список номеров, если нет — отдаем пустой красивый список
+        return book.getOrDefault(surname, new ArrayList<>());
+    }
 }
