@@ -1,96 +1,102 @@
-public class Main {
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
 
-    public static void main(String[] args) {
-        // Создаем правильную коробку 4х4, где лежат только цифры
-        String[][] goodBox = {
-                {"1", "2", "3", "4"},
-                {"5", "6", "7", "8"},
-                {"9", "1", "2", "3"},
-                {"4", "5", "6", "7"}
-        };
+class PostmanEchoTest {
 
-        // Создаем сломанную коробку (тут на одном этаже 5 комнат вместо 4)
-        String[][] badSizeBox = {
-                {"1", "2", "3", "4"},
-                {"5", "6", "7", "8", "9"},
-                {"9", "1", "2", "3"},
-                {"4", "5", "6", "7"}
-        };
-
-        // Создаем коробку с буквой-вредителем "Х" вместо цифры
-        String[][] badDataBox = {
-                {"1", "2", "3", "4"},
-                {"5", "6", "Х", "8"},
-                {"9", "1", "2", "3"},
-                {"4", "5", "6", "7"}
-        };
-
-        System.out.println("--- ТЕСТ 1: Проверяем правильный массив ---");
-        try {
-            int result = checkAndSum(goodBox);
-            System.out.println("Сумма всех чисел в массиве: " + result);
-        } catch (MyArraySizeException | MyArrayDataException e) {
-            System.out.println("Найдена ошибка: " + e.getMessage());
-        }
-
-        System.out.println("\n--- ТЕСТ 2: Подставляем массив неправильного размера ---");
-        try {
-            checkAndSum(badSizeBox);
-        } catch (MyArraySizeException | MyArrayDataException e) {
-            System.out.println("Найдена ошибка размера: " + e.getMessage());
-        }
-
-        System.out.println("\n--- ТЕСТ 3: Подставляем массив с буквой внутри ---");
-        try {
-            checkAndSum(badDataBox);
-        } catch (MyArraySizeException | MyArrayDataException e) {
-            System.out.println("Найдена ошибка данных: " + e.getMessage());
-        }
-
-        System.out.println("\n--- ТЕСТ 4: Специально ломаем массив (Пункт 4) ---");
-        try {
-            makeMistake();
-        } catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println("Найдена классическая ошибка: Выход за границы массива!");
-        }
+    @Test
+    @DisplayName("Тест 1 - Проверка метода GET")
+    void testGetMethod() {
+        given()
+                .baseUri("https://postman-echo.com")
+                .queryParam("userId", "777")
+                .queryParam("isUnban", "true")
+                .when()
+                .get("/get")
+                .then()
+                .statusCode(200)
+                .body("args.userId", equalTo("777"))
+                .body("args.isUnban", equalTo("true"))
+                .body("headers.host", equalTo("postman-echo.com"))
+                .body("headers.x-forwarded-proto", equalTo("https"))
+                .body("url", equalTo("https://postman-echo.com"));
     }
 
-    // Наш главный робот-конвейер
-    public static int checkAndSum(String[][] box) throws MyArraySizeException, MyArrayDataException {
-        if (box.length != 4) {
-            throw new MyArraySizeException("В массиве  должно быть ровно 4 строки!");
-        }
-        for (int i = 0; i < box.length; i++) {
-            if (box[i].length != 4) {
-                throw new MyArraySizeException("На строке " + i + " должно быть ровно 4 ячейки!");
-            }
-        }
+    @Test
+    @DisplayName("Тест 2 - Проверка метода POST")
+    void testPostMethod() {
+        String jsonBody = "{\n" +
+                "  \"text\": \"Hello Aston!\"\n" +
+                "}";
 
-        int totalSum = 0;
-        for (int i = 0; i < box.length; i++) {
-            for (int j = 0; j < box[i].length; j++) {
-                try {
-                    totalSum += Integer.parseInt(box[i][j]);
-                } catch (NumberFormatException e) {
-                    throw new MyArrayDataException("Внимание! На строке " + i + ", в ячейке " + j + " лежит что-то иное вместо числа!");}
-            }
-        }
-        return totalSum;
+        given()
+                .baseUri("https://postman-echo.com")
+                .contentType("application/json")
+                .body(jsonBody)
+                .when()
+                .post("/post")
+                .then()
+                .statusCode(200)
+                .body("json.text", equalTo("Hello Aston!"))
+                .body("headers.host", equalTo("postman-echo.com"))
+                .body("headers.x-forwarded-proto", equalTo("https"))
+                .body("url", equalTo("https://postman-echo.com"));
     }
 
-    // Вредный робот для пункта 4
-    public static void makeMistake() {
-        String[] smallArray = {"Яблоко", "Банан"};
-        // Специально просим выдать 5-й элемент (которого нет), чтобы программа закричала
-        System.out.println(smallArray[5]);
+    @Test
+    @DisplayName("Тест 3 - Проверка метода PUT")
+    void testPutMethod() {
+        String jsonBody = "{\n" +
+                "  \"status\": \"updated\"\n" +
+                "}";
+
+        given()
+                .baseUri("https://postman-echo.com")
+                .contentType("application/json")
+                .body(jsonBody)
+                .when()
+                .put("/put")
+                .then()
+                .statusCode(200)
+                .body("json.status", equalTo("updated"))
+                .body("headers.host", equalTo("postman-echo.com"))
+                .body("headers.x-forwarded-proto", equalTo("https"))
+                .body("url", equalTo("https://postman-echo.com"));
     }
-}
 
-// Наши кастомные кричалки-ошибки
-class MyArraySizeException extends Exception {
-    public MyArraySizeException(String message) { super(message); }
-}
+    @Test
+    @DisplayName("Те.ст 4 - Проверка метода PATCH")
+    void testPatchMethod() {
+        String jsonBody = "{\n" +
+                "  \"role\": \"admin\"\n" +
+                "}";
 
-class MyArrayDataException extends Exception {
-    public MyArrayDataException(String message) { super(message); }
+        given()
+                .baseUri("https://postman-echo.com")
+                .contentType("application/json")
+                .body(jsonBody)
+                .when()
+                .patch("/patch")
+                .then()
+                .statusCode(200)
+                .body("json.role", equalTo("admin"))
+                .body("headers.host", equalTo("postman-echo.com"))
+                .body("headers.x-forwarded-proto", equalTo("https"))
+                .body("url", equalTo("https://postman-echo.com"));
+    }
+
+    @Test
+    @DisplayName("Тест 5 - Проверка метода DELETE")
+    void testDeleteMethod() {
+        given()
+                .baseUri("https://postman-echo.com")
+                .when()
+                .delete("/delete")
+                .then()
+                .statusCode(200)
+                .body("headers.host", equalTo("postman-echo.com"))
+                .body("headers.x-forwarded-proto", equalTo("https"))
+                .body("url", equalTo("https://postman-echo.com"));
+    }
 }
